@@ -1,0 +1,37 @@
+@font-face {
+  font-display: swap;
+  font-family: "Bebas Neue";
+  font-style: normal;
+  font-weight: 400;
+  src: url("./assets/bebas-neue-v14-latin-regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Comfortaa";
+  font-style: normal;
+  font-weight: 400;
+  src: url("./assets/comfortaa-v45-latin-regular.woff2") format("woff2");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  font-family: "Comfortaa";
+}
+
+html {
+  font-size: 62.5%;
+}
+
+.container {
+  width: 100%;
+  height: 100vh;
+  background-color: #660a0a;
+  display: grid;
+  place-items: center;
+  /* below is used for shadow effect */
+  perspective: 100rem;
+}
