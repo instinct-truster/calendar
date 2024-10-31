@@ -24,21 +24,34 @@ const CalendarApp = () => {
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
-  console.log(daysInMonth, firstDayOfMonth);
+  const prevMonth = () => {
+    setCurrentMonth((prevMonth) => (prevMonth === 0 ? 11 : prevMonth - 1));
+    setCurrentYear((prevYear) =>
+      currentMonth === 0 ? prevYear - 1 : prevYear
+    );
+  };
+
+  const nextMonth = () => {
+    setCurrentMonth((prevMonth) => (prevMonth === 11 ? 0 : prevMonth + 1));
+    setCurrentYear((prevYear) =>
+      currentMonth === 11 ? prevYear + 1 : prevYear
+    );
+  };
 
   return (
     <div className="calendar-app">
       <div className="calendar">
         <h1 className="heading">Calendar</h1>
         <div className="navigate-date">
-          <h2 className="month">November,</h2>
-          <h2 className="year">2024</h2>
+          <h2 className="month">{monthsOfYear[currentMonth]},</h2>
+          <h2 className="year">{currentYear}</h2>
           <div className="buttons">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24px"
               height="24px"
               viewBox="0 0 24 24"
+              onClick={prevMonth}
             >
               <path
                 fill="currentColor"
@@ -50,6 +63,7 @@ const CalendarApp = () => {
               width="24px"
               height="24px"
               viewBox="0 0 24 24"
+              onClick={nextMonth}
             >
               <path
                 fill="currentColor"
@@ -68,7 +82,18 @@ const CalendarApp = () => {
             <span key={`empty-${index}`} />
           ))}
           {[...Array(daysInMonth).keys()].map((day) => (
-            <span key={day + 1}>{day + 1}</span>
+            <span
+              key={day + 1}
+              className={
+                day + 1 === currentDate.getDate() &&
+                currentMonth === currentDate.getMonth() &&
+                currentYear === currentDate.getFullYear()
+                  ? "current-day"
+                  : ""
+              }
+            >
+              {day + 1}
+            </span>
           ))}
         </div>
       </div>
