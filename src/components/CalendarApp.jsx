@@ -21,6 +21,9 @@ const CalendarApp = () => {
 
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
+  const [selectedDate, setSelectedDate] = useState(currentDate);
+  const [showEventPopup, setShowEventPopup] = useState(false);
+
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
@@ -35,6 +38,24 @@ const CalendarApp = () => {
     setCurrentMonth((prevMonth) => (prevMonth === 11 ? 0 : prevMonth + 1));
     setCurrentYear((prevYear) =>
       currentMonth === 11 ? prevYear + 1 : prevYear
+    );
+  };
+
+  const handleDayClick = (day) => {
+    const clickedDate = new Date(currentYear, currentMonth, day);
+    const today = new Date();
+
+    if (clickedDate >= today || isSameDay(clickedDate, today)) {
+      setSelectedDate(clickedDate);
+      setShowEventPopup(true);
+    }
+  };
+
+  const isSameDay = (date1, date2) => {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
     );
   };
 
@@ -91,6 +112,7 @@ const CalendarApp = () => {
                   ? "current-day"
                   : ""
               }
+              onClick={() => handleDayClick(day + 1)}
             >
               {day + 1}
             </span>
@@ -98,40 +120,46 @@ const CalendarApp = () => {
         </div>
       </div>
       <div className="events">
-        <div className="event-popup">
-          <div className="time-input">
-            <div className="event-popup-time">Time</div>
-            <input
-              type="number"
-              name="hours"
-              min={0}
-              max={24}
-              className="hours"
-            />
-            <input
-              type="number"
-              name="minutes"
-              min={0}
-              max={60}
-              className="minutes"
-            />
-          </div>
-          <textarea placeholder="Enter Event Text (Maximum 60 Characters"></textarea>
-          <button className="event-popup-button">Add Event</button>
-          <button className="close-event-popup">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24px"
-              height="24px"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="m7.05 5.636l4.95 4.95l4.95-4.95l1.414 1.414l-4.95 4.95l4.95 4.95l-1.415 1.414l-4.95-4.95l-4.949 4.95l-1.414-1.414l4.95-4.95l-4.95-4.95z"
+        {showEventPopup && (
+          <div className="event-popup">
+            <div className="time-input">
+              <div className="event-popup-time">Time</div>
+              <input
+                type="number"
+                name="hours"
+                min={0}
+                max={24}
+                className="hours"
               />
-            </svg>
-          </button>
-        </div>
+              <input
+                type="number"
+                name="minutes"
+                min={0}
+                max={60}
+                className="minutes"
+              />
+            </div>
+            <textarea placeholder="Enter Event Text (Maximum 60 Characters"></textarea>
+            <button className="event-popup-button">Add Event</button>
+            <button
+              className="close-event-popup"
+              onClick={() => setShowEventPopup(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24px"
+                height="24px"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d="m7.05 5.636l4.95 4.95l4.95-4.95l1.414 1.414l-4.95 4.95l4.95 4.95l-1.415 1.414l-4.95-4.95l-4.949 4.95l-1.414-1.414l4.95-4.95l-4.95-4.95z"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+
         <div className="event">
           <div className="event-date-wrapper">
             <div className="event-date">November 5, 2024</div>
