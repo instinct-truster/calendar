@@ -23,6 +23,10 @@ const CalendarApp = () => {
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
   const [selectedDate, setSelectedDate] = useState(currentDate);
   const [showEventPopup, setShowEventPopup] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [eventTime, setEventTime] = useState({ hours: "00", minutes: "00" });
+  const [eventText, setEventText] = useState("");
+  const [editingEvent, setEditingEvent] = useState(null);
 
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
@@ -48,6 +52,9 @@ const CalendarApp = () => {
     if (clickedDate >= today || isSameDay(clickedDate, today)) {
       setSelectedDate(clickedDate);
       setShowEventPopup(true);
+      setEventTime({ hours: "00", minutes: "00" });
+      setEventText("");
+      setEditingEvent(null);
     }
   };
 
@@ -59,13 +66,68 @@ const CalendarApp = () => {
     );
   };
 
+  const handleEventSubmit = () => {
+    const newEvent = {
+      id: editingEvent ? editingEvent.id : Date.now(),
+      date: selectedDate,
+      time: `${eventTime.hours.padStart(2, "0")}:${eventTime.minutes.padStart(
+        2,
+        "0"
+      )}`,
+      text: eventText,
+    };
+
+    let updatedEvents = [...events];
+
+    if (editingEvent) {
+      updatedEvents = updatedEvents.map((event) =>
+        event.id === editingEvent.id ? newEvent : event
+      );
+    } else {
+      updatedEvents.push(newEvent);
+    }
+
+    updatedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    setEvents(updatedEvents);
+    setEventTime({ hours: "00", minutes: "00" });
+    setEventText("");
+    setShowEventPopup(false);
+    setEditingEvent(null);
+  };
+
+  const handleEditEvent = (event) => {
+    setSelectedDate(new Date(event.date));
+    setEventTime({
+      hours: event.time.split(":")[0],
+      minutes: event.time.split(":")[1],
+    });
+    setEventText(event.text);
+    setEditingEvent(event);
+    setShowEventPopup(true);
+  };
+
+  const handleDeleteEvent = (eventId) => {
+    const updatedEvents = events.filter((event) => event.id !== eventId);
+    setEvents(updatedEvents);
+  };
+
+  const handleTimeChange = (e) => {
+    const { name, value } = e.target;
+
+    setEventTime((prevTime) => ({
+      ...prevTime,
+      [name]: value.padStart(2, "0"),
+    }));
+  };
+
   return (
     <div className="calendar-app">
       <div className="calendar">
         <h1 className="heading">Calendar</h1>
         <div className="navigate-date">
           <h2 className="month">{monthsOfYear[currentMonth]},</h2>
-          <h2 className="year">{currentYear}</h2>
+          <h2 className="year"> {currentYear}</h2>
           <div className="buttons">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -130,6 +192,8 @@ const CalendarApp = () => {
                 min={0}
                 max={24}
                 className="hours"
+                value={eventTime.hours}
+                onChange={handleTimeChange}
               />
               <input
                 type="number"
@@ -137,10 +201,22 @@ const CalendarApp = () => {
                 min={0}
                 max={60}
                 className="minutes"
+                value={eventTime.minutes}
+                onChange={handleTimeChange}
               />
             </div>
-            <textarea placeholder="Enter Event Text (Maximum 60 Characters"></textarea>
-            <button className="event-popup-button">Add Event</button>
+            <textarea
+              placeholder="Enter Event Text (Maximum 60 Characters"
+              value={eventText}
+              onChange={(e) => {
+                if (e.target.value.length <= 60) {
+                  setEventText(e.target.value);
+                }
+              }}
+            ></textarea>
+            <button className="event-popup-button" onClick={handleEventSubmit}>
+              {editingEvent ? "Update Event" : "Add Event"}
+            </button>
             <button
               className="close-event-popup"
               onClick={() => setShowEventPopup(false)}
@@ -159,42 +235,47 @@ const CalendarApp = () => {
             </button>
           </div>
         )}
-
-        <div className="event">
-          <div className="event-date-wrapper">
-            <div className="event-date">November 5, 2024</div>
-            <div className="event-time">10:00</div>
+        {events.map((event, index) => (
+          <div className="event" key={index}>
+            <div className="event-date-wrapper">
+              <div className="event-date">{`${
+                monthsOfYear[event.date.getMonth()]
+              } ${event.date.getDate()}, ${event.date.getFullYear()}`}</div>
+              <div className="event-time">{event.time}</div>
+            </div>
+            <div className="event-text">{event.text}</div>
+            <div className="event-buttons">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24px"
+                height="24px"
+                viewBox="0 0 24 24"
+                onClick={() => handleEditEvent(event)}
+              >
+                <path
+                  fill="currentColor"
+                  d="M15.748 2.947a2 2 0 0 1 2.828 0l2.475 2.475a2 2 0 0 1 0 2.829L9.158 20.144l-6.38 1.076l1.077-6.38zm-.229 3.057l2.475 2.475l1.643-1.643l-2.475-2.474zm1.06 3.89l-2.474-2.475l-8.384 8.384l-.503 2.977l2.977-.502z"
+                />
+              </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24px"
+                height="24px"
+                viewBox="0 0 512 512"
+                onClick={() => handleDeleteEvent(event.id)}
+              >
+                <path
+                  fill="none"
+                  d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8"
+                />
+                <path
+                  fill="currentColor"
+                  d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32M192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416M272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z"
+                />
+              </svg>
+            </div>
           </div>
-          <div className="event-text">Workout with Waylon and Lance</div>
-          <div className="event-buttons">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24px"
-              height="24px"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="M15.748 2.947a2 2 0 0 1 2.828 0l2.475 2.475a2 2 0 0 1 0 2.829L9.158 20.144l-6.38 1.076l1.077-6.38zm-.229 3.057l2.475 2.475l1.643-1.643l-2.475-2.474zm1.06 3.89l-2.474-2.475l-8.384 8.384l-.503 2.977l2.977-.502z"
-              />
-            </svg>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24px"
-              height="24px"
-              viewBox="0 0 512 512"
-            >
-              <path
-                fill="none"
-                d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8"
-              />
-              <path
-                fill="currentColor"
-                d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32M192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416M272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z"
-              />
-            </svg>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

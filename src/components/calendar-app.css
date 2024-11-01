@@ -59,7 +59,7 @@
 .buttons svg {
   width: 24px;
   height: 24px;
-  background-color: #ae5a30;
+  background-color: #660a0a;
   border-radius: 50%;
   border: 2px solid #fbc9a8;
   display: flex;
@@ -105,6 +105,7 @@
 
 .current-day {
   background-color: #00bbff;
+  border: 2px solid white;
   border-radius: 50%;
   box-shadow: 0 0 14px 8px rgba(132, 208, 244, 0.3);
   font-weight: bold;
@@ -114,6 +115,11 @@
   width: 60%;
   height: 100%;
   padding: 30px 0;
+  overflow-y: auto;
+}
+
+.events::-webkit-scrollbar {
+  display: none;
 }
 
 .event-popup {
@@ -242,6 +248,7 @@
   flex-direction: column;
   align-items: center;
   width: 30%;
+  padding-top: 16px;
   border-right: 1px solid rgba(255, 255, 255, 0.5);
 }
 
@@ -281,4 +288,99 @@
 .event-buttons svg {
   color: white;
   cursor: pointer;
+}
+
+@media (max-width: 850px) {
+  .calendar-app {
+    flex-direction: column;
+    row-gap: 20px;
+    aspect-ratio: 3 / 2;
+  }
+
+  .calendar {
+    width: 70%;
+    margin: auto;
+  }
+
+  .navigate-date {
+    margin: 10px 0;
+  }
+
+  .weekdays {
+    margin: 10px 0;
+  }
+
+  .events {
+    width: 80%;
+    margin: auto;
+  }
+
+  .event-popup {
+    top: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    aspect-ratio: 4 / 3;
+    row-gap: 10px;
+  }
+
+  .event-popup-time {
+    width: clamp(50px, 10cqi, 80px);
+    font-size: clamp(15px, 3cqi, 22px);
+  }
+
+  .time-input input {
+    width: clamp(50px, 10cqi, 80px);
+    font-size: clamp(12px, 2cqi, 16px);
+  }
+
+  .event-popup textarea {
+    width: clamp(180px, 35cqi, 280px);
+  }
+
+  .event-popup textarea::placeholder {
+    font-size: clamp(10px, 1.5cqi, 12px);
+  }
+
+  .event-popup-button {
+    width: clamp(180px, 35cqi, 280px);
+    font-size: clamp(16px, 3cqi, 22px);
+  }
+
+  .event-date {
+    font-size: clamp(10px, 1.4cqi, 12px);
+  }
+
+  .event-time {
+    font-size: clamp(10px, 2cqi, 16px);
+  }
+
+  .event-text {
+    font-size: clamp(10px, 2.5cqi, 14px);
+  }
+}
+
+@media (max-width: 500px) {
+  .calendar-app {
+    aspect-ratio: 10 / 9;
+  }
+
+  .calendar {
+    width: 100%;
+  }
+
+  .event-popup {
+    top: 23%;
+    width: 80%;
+  }
+
+  .events {
+    width: 100%;
+  }
+}
+
+@media (max-width: 375px) {
+  .calendar-app {
+    aspect-ratio: 3 / 2;
+  }
 }

@@ -33,5 +33,12 @@ html {
   display: grid;
   place-items: center;
   /* below is used for shadow effect */
+  overflow: hidden;
   perspective: 100rem;
+}
+
+@media (max-width: 500px) {
+  html {
+    font-size: 55%;
+  }
 }
